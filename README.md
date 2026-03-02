@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 営業日報システム (Sales Daily Report System)
 
-## Getting Started
+営業担当者が日々の訪問活動を報告し、上長がコメントを行うための営業日報管理システムです。
 
-First, run the development server:
+## 主要機能
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 営業担当者が顧客訪問記録を含む日報を作成・提出（1日1日報、訪問記録は複数可）
+- 課題・相談（Problem）と明日やること（Plan）を記入
+- 上長が日報に対してコメントを投稿
+- 顧客マスタ・営業マスタの管理
+
+## ディレクトリ構成
+
+```
+sales-report-system/
+├── app/          # Next.js アプリケーション
+├── docs/         # 仕様書（画面定義書・API仕様書・テスト仕様書）
+├── CLAUDE.md     # AI開発アシスタント向け設定
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## セットアップ
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+cd app
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+開発サーバーが http://localhost:3000 で起動します。
 
-## Learn More
+## 仕様書
 
-To learn more about Next.js, take a look at the following resources:
+| ドキュメント | ファイル |
+|-------------|---------|
+| 画面定義書 | [docs/営業日報システム_画面定義書.md](docs/営業日報システム_画面定義書.md) |
+| API仕様書 | [docs/営業日報システム_API仕様書.md](docs/営業日報システム_API仕様書.md) |
+| テスト仕様書 | [docs/営業日報システム_テスト仕様書.md](docs/営業日報システム_テスト仕様書.md) |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 技術スタック
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **フロントエンド**: Next.js / React / TypeScript / Tailwind CSS
+- **コード品質**: ESLint / Prettier / Husky / lint-staged
