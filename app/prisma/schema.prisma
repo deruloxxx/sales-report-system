@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// 営業マスタ - 営業担当者情報。自己参照で上長関係を管理
+model SalesStaff {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  department   String?
+  position     String?
+  managerId    Int?     @map("manager_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // 自己参照リレーション（上長）
+  manager     SalesStaff?  @relation("ManagerSubordinates", fields: [managerId], references: [id], onDelete: Restrict)
+  subordinates SalesStaff[] @relation("ManagerSubordinates")
+
+  // リレーション
+  customers       Customer[]
+  dailyReports    DailyReport[]
+  managerComments ManagerComment[]
+
+  @@map("sales_staffs")
+}
+
+/// 顧客マスタ - 顧客情報。担当営業を持つ
+model Customer {
+  id           Int      @id @default(autoincrement())
+  name         String
+  address      String?
+  phone        String?
+  salesStaffId Int      @map("sales_staff_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // リレーション
+  salesStaff   SalesStaff    @relation(fields: [salesStaffId], references: [id], onDelete: Restrict)
+  visitRecords VisitRecord[]
+
+  @@map("customers")
+}
+
+/// 日報 - 日報本体。営業1人につき1日1件（UNIQUE制約）
+model DailyReport {
+  id           Int      @id @default(autoincrement())
+  salesStaffId Int      @map("sales_staff_id")
+  reportDate   DateTime @map("report_date")
+  status       String   @default("draft")
+  problem      String?
+  plan         String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // リレーション
+  salesStaff      SalesStaff       @relation(fields: [salesStaffId], references: [id], onDelete: Restrict)
+  visitRecords    VisitRecord[]
+  managerComments ManagerComment[]
+
+  @@unique([salesStaffId, reportDate])
+  @@map("daily_reports")
+}
+
+/// 訪問記録 - 日報に紐づく訪問記録。1日報に複数件
+model VisitRecord {
+  id            Int      @id @default(autoincrement())
+  dailyReportId Int      @map("daily_report_id")
+  customerId    Int      @map("customer_id")
+  visitContent  String   @map("visit_content")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // リレーション
+  dailyReport DailyReport @relation(fields: [dailyReportId], references: [id], onDelete: Restrict)
+  customer    Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  @@map("visit_records")
+}
+
+/// 上長コメント - 日報に対する上長のコメント
+model ManagerComment {
+  id            Int      @id @default(autoincrement())
+  dailyReportId Int      @map("daily_report_id")
+  commenterId   Int      @map("commenter_id")
+  commentBody   String   @map("comment_body")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  // リレーション
+  dailyReport DailyReport @relation(fields: [dailyReportId], references: [id], onDelete: Restrict)
+  commenter   SalesStaff  @relation(fields: [commenterId], references: [id], onDelete: Restrict)
+
+  @@map("manager_comments")
+}
